@@ -1,0 +1,15 @@
+{
+    "name": "gimzed/projet_rent_a_car",
+    "autoload": {
+        "psr-4": {
+            "Gimzed\\ProjetRentACar\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Agim Coroli",
+            "email": "agim.coroli8016@gmail.com"
+        }
+    ],
+    "require": {}
+}
