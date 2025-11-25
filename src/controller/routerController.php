@@ -1,6 +1,7 @@
 <?php
 
-
+use service\UserService;
+require_once PATH."/src/model/Utilities.php";
 # Connexion PDO
 try {
     $connectPDO = new PDO(
@@ -17,9 +18,72 @@ try {
 }
 
 
-// api pour plutard
-if (isset($_GET['api'])) {
-    // echo json_encode();
+// API pour la gestion des utilisateurs
+if (isset($_GET['api']) && $_GET['api'] === 'users') {
+    $userService = new UserService($connectPDO);
+
+    // Récupération de la méthode HTTP
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    // Récupération de l'ID depuis l'URL (ex: ?api=users&id=1)
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+
+    // Récupération des données JSON du body
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+    switch ($method) {
+        case 'GET':
+            if ($id) {
+                // GET /?api=users&id=1
+                $response = $userService->getUserById($id);
+            } else {
+                // GET /?api=users
+                $response = $userService->getAllUsers();
+            }
+            break;
+
+        case 'POST':
+            // POST /?api=users
+            $response = $userService->createUser($input);
+            break;
+
+        case 'PUT':
+            // PUT /?api=users&id=1
+            if (!$id) {
+                $response = [
+                    'success' => false,
+                    'message' => 'ID requis pour la mise à jour',
+                    'status_code' => 400
+                ];
+            } else {
+                $response = $userService->updateUser($id, $input);
+            }
+            break;
+
+        case 'DELETE':
+            // DELETE /?api=users&id=1
+            if (!$id) {
+                $response = [
+                    'success' => false,
+                    'message' => 'ID requis pour la suppression',
+                    'status_code' => 400
+                ];
+            } else {
+                $response = $userService->deleteUser($id);
+            }
+            break;
+
+        default:
+            $response = [
+                'success' => false,
+                'message' => 'Méthode non autorisée',
+                'status_code' => 405
+            ];
+    }
+
+    // Envoie la réponse JSON et arrête l'exécution
+    $userService->sendJsonResponse($response);
+    exit;
 }
 
 
@@ -27,24 +91,14 @@ if (isset($_GET['api'])) {
 if (isset($_SESSION['admin']) && $_SESSION['admin'] === true) {
     // on charge le contrôleur admin
     require_once PATH . "/src/controller/adminController.php";
-}else{
+} else {
     // on charge le contrôleur public
     require_once PATH . "/src/controller/publicController.php";
-
 }
 
 
 // Débogage
-echo '<div class="container"><hr><h3>Barre de débogage</h3><hr>';
-echo '<h4>session_id() ou SID</h4>';
-var_dump(session_id());
-echo '<h4>$_GET</h4>';
-var_dump($_GET);
-echo '<h4>$_SESSION</h4>';
-var_dump($_SESSION);
-echo '<h3>$_POST</h3>';
-var_dump($_POST);
-echo '</div>';
+debugBar();
 
 
 

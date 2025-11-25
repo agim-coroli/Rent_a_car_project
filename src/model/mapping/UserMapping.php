@@ -6,6 +6,21 @@ use DateTime;
 use model\AbstractMapping;
 use Exception;
 
+// Quand on creer un objet de UserMapping il ressemble a ca -> 
+
+// UserMapping Object {
+//     id => 1
+//     full_name => "John Doe"
+//     pseudo => "johndoe"
+//     email => "john@example.com"
+//     phone => "+32490120095"
+//     password => "$2y$10$..." (hashé)
+//     date_birth => DateTime Object (1990-01-15)
+//     gender => "Masculin"
+//     role => false
+//     created_at => DateTime Object (2024-01-01 10:00:00)
+// }
+
 class UserMapping extends AbstractMapping
 {
     protected ?int $id = null;
@@ -140,7 +155,7 @@ class UserMapping extends AbstractMapping
 
 
 
-    public function getDateBirth(): ?\DateTime
+    public function getDateBirth(): ?DateTime
     {
         return $this->date_birth;
     }
@@ -148,13 +163,13 @@ class UserMapping extends AbstractMapping
     public function setDateBirth(?string $date_birth): self
     {
         if ($date_birth === null || $date_birth === '') {
-            throw new \Exception("La date de naissance ne peut pas être vide.");
+            throw new Exception("La date de naissance ne peut pas être vide.");
         }
 
-        $date = \DateTime::createFromFormat('Y-m-d', $date_birth);
+        $date = DateTime::createFromFormat('Y-m-d', $date_birth);
 
         if (!$date) {
-            throw new \Exception("Format de date invalide. Utilisez AAAA-MM-JJ.");
+            throw new Exception("Format de date invalide. Utilisez AAAA-MM-JJ.");
         }
 
         $this->date_birth = $date;

@@ -7,6 +7,24 @@ use model\mapping\UserMapping;
 use model\UserInterface;
 use model\ManagerInterface;
 
+// quand on creer un objet UserManager il ressemble a ->
+
+// UserManager Object {
+//     pdo => PDO Object (connexion à la base de données)
+//     table => "users"
+    
+//     // Méthodes disponibles :
+//     create($user) => bool
+//     findById($id) => UserMapping|null
+//     findByEmail($email) => UserMapping|null
+//     findAll() => array[UserMapping]
+//     update($user) => bool
+//     delete($id) => bool
+//     connect($tab) => bool
+//     disconnect() => bool
+//     generateHiddenId() => string
+// }
+
 class UserManager implements ManagerInterface, UserInterface
 {
     protected PDO $pdo;
