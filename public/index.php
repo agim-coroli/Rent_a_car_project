@@ -33,4 +33,4 @@ spl_autoload_register(function ($class) {
 });
 
 // chargement du router
-require_once PATH . "/src/controller/routerController.php";
+require_once PATH . "../src/controller/routerController.php";

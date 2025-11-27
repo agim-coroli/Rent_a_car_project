@@ -160,19 +160,15 @@ class UserMapping extends AbstractMapping
         return $this->date_birth;
     }
 
-    public function setDateBirth(?string $date_birth): self
+    public function setDateBirth($date_birth): self
     {
-        if ($date_birth === null || $date_birth === '') {
-            throw new Exception("La date de naissance ne peut pas être vide.");
+        if ($date_birth instanceof DateTime) {
+            $this->date_birth = $date_birth;
+        } elseif (is_string($date_birth) && $date_birth !== '') {
+            $this->date_birth = DateTime::createFromFormat('Y-m-d', $date_birth);
+        } else {
+            $this->date_birth = null;
         }
-
-        $date = DateTime::createFromFormat('Y-m-d', $date_birth);
-
-        if (!$date) {
-            throw new Exception("Format de date invalide. Utilisez AAAA-MM-JJ.");
-        }
-
-        $this->date_birth = $date;
         return $this;
     }
 
@@ -208,11 +204,11 @@ class UserMapping extends AbstractMapping
 
     // pas besoin ---------------------------
 
-    // public function setRole(?bool $role): self
-    // {
-    //     $this->role = $role;
-    //     return $this;
-    // }
+    public function setRole(?bool $role): self
+    {
+        $this->role = $role;
+        return $this;
+    }
 
     public function getCreatedAt(): ?DateTime
     {
@@ -221,9 +217,15 @@ class UserMapping extends AbstractMapping
 
     // pas besoin ---------------------------
 
-    // public function setCreatedAt(?DateTime $created_at): self
-    // {
-    //     $this->created_at = $created_at;
-    //     return $this;
-    // }
+    public function setCreatedAt($created_at): self
+    {
+        if ($created_at instanceof DateTime) {
+            $this->created_at = $created_at;
+        } elseif (is_string($created_at) && $created_at !== '') {
+            $this->created_at = new DateTime($created_at);
+        } else {
+            $this->created_at = null;
+        }
+        return $this;
+    }
 }

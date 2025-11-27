@@ -7,8 +7,14 @@
     <title>Document</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
+<?php if (isset($_SESSION['admin']) && $_SESSION['admin'] === true) : ?>
 
-<body>
+    <body style="background-color: brown;">
+
+    <?php else: ?>
+
+        <body>
+        <?php endif; ?>
     <p>erreur 404</p>
     <a href="./">Accueil</a>
 </body>

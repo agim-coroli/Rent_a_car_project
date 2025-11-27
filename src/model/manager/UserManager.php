@@ -12,7 +12,7 @@ use model\ManagerInterface;
 // UserManager Object {
 //     pdo => PDO Object (connexion à la base de données)
 //     table => "users"
-    
+
 //     // Méthodes disponibles :
 //     create($user) => bool
 //     findById($id) => UserMapping|null
@@ -92,7 +92,7 @@ class UserManager implements ManagerInterface, UserInterface
      */
     public function findAll(): array
     {
-        $sql = "SELECT * FROM {$this->table} ORDER BY id DESC";
+        $sql = "SELECT * FROM {$this->table} ORDER BY id ASC";
         $stmt = $this->pdo->query($sql);
         $results = [];
         while ($row = $stmt->fetch()) {
@@ -147,6 +147,9 @@ class UserManager implements ManagerInterface, UserInterface
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
+
+
+
 
     /**
      * Déconnexion

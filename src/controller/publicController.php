@@ -12,7 +12,7 @@ if (isset($_GET['pg'])) {
     switch ($_GET['pg']) {
 
         case 'catalogue':
-            require_once PATH . "/src/view/catalogue.php";
+            require_once PATH ."/src/view/catalogue.php";
 
             break;
         case 'connexion':
@@ -21,7 +21,7 @@ if (isset($_GET['pg'])) {
 
                 // si connect est respecté l'utilisateur est rediriger vers la racine et la session devien admin
                 if ($manageUser->connect($_POST)) {
-                    header("Location:" . RACINE_URL);
+                    header("Location:./");
                     exit();
                 }
             }
@@ -38,7 +38,7 @@ if (isset($_GET['pg'])) {
 
                 // si tout est bon, on inscrit dans la bdd et on redirige
                 if ($manageUser->create($newUser)) {
-                    header("Location:" . RACINE_URL);
+                    header("Location:./");
                     exit();
                 }
             }
