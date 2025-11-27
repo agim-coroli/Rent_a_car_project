@@ -21,6 +21,14 @@
 
         <p>Bienvenue sur le dashboard</p>
 
+
+        <!-- Bouton de test pour ajouter des utilisateur -->
+        <div style="margin: 20px 0;">
+            <a href="?pg=generate-user" style="padding: 5px 5px; background-color: #4CAF50; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                ➕
+            </a>
+        </div>
+
         <?php if (isset($_GET['pg']) && $_GET['pg'] === "edit"): ?>
 
 
@@ -58,27 +66,27 @@
                                     <td><input type="text" name="full_name"
                                             value="<?= htmlspecialchars($value->getFullName()) ?>"></td>
 
-                                    <td><input type="text" name="users[<?= $value->getId() ?>][pseudo]"
+                                    <td><input type="text" name="pseudo"
                                             value="<?= htmlspecialchars($value->getPseudo()) ?>"></td>
 
-                                    <td><input type="email" name="users[<?= $value->getId() ?>][email]"
+                                    <td><input type="email" name="email"
                                             value="<?= htmlspecialchars($value->getEmail()) ?>"></td>
 
-                                    <td><input type="text" name="users[<?= $value->getId() ?>][phone]"
+                                    <td><input type="text" name="phone"
                                             value="<?= htmlspecialchars($value->getPhone()) ?>"></td>
 
-                                    <td><input type="date" name="users[<?= $value->getId() ?>][date_birth]"
+                                    <td><input type="date" name="date_birth"
                                             value="<?= $value->getDateBirth() ? $value->getDateBirth()->format('Y-m-d') : '' ?>"></td>
 
                                     <td>
-                                        <select name="users[<?= $value->getId() ?>][gender]">
-                                            <option value="male" <?= $value->getGender() === 'male' ? 'selected' : '' ?>>Male</option>
-                                            <option value="female" <?= $value->getGender() === 'female' ? 'selected' : '' ?>>Female</option>
+                                        <select name="gender">
+                                            <option value="Masculin" <?= $value->getGender() === 'Masculin' ? 'selected' : '' ?>>Masculin</option>
+                                            <option value="Feminin" <?= $value->getGender() === 'Feminin' ? 'selected' : '' ?>>Feminin</option>
                                         </select>
                                     </td>
 
                                     <td>
-                                        <select name="users[<?= $value->getId() ?>][role]">
+                                        <select name="role">
                                             <option value="0" <?= $value->getRole() === 0 ? 'selected' : '' ?>>User</option>
                                             <option value="1" <?= $value->getRole() === 1 ? 'selected' : '' ?>>Admin</option>
                                         </select>
@@ -87,8 +95,11 @@
                                     <td><?= $value->getCreatedAt() ? htmlspecialchars($value->getCreatedAt()->format('Y-m-d H:i:s')) : '' ?></td>
 
                                     <td>
-                                        <button type="submit">Update</button>
+                                        <button>Update</button> Or
                                         <a href="?pg=delete&id=<?= $value->getId() ?>">Delete</a>
+                                    </td>
+                                    <td>
+                                        <a href="?pg=dashboard">X</a>
                                     </td>
                                 </tr>
                             </form>
@@ -153,16 +164,6 @@
 
 
         <?php endif; ?>
-
-
-
-
-
-
-
-
-
-
 
 
         </body>

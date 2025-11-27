@@ -3,6 +3,7 @@
 namespace model;
 
 use Exception;
+use model\Exception\ExceptionFr;
 
 // Trait pour les fonctions utilitaires sur les chaînes de caractères, elles sont statiques pour être appelées sans être obligé d'instancier la classe (mais on peut aussi le faire)
 trait StringTrait{
@@ -54,7 +55,7 @@ trait StringTrait{
 
         // 7. si pas de texte valide
         if (empty($text)) {
-            throw new Exception("Slugify failed");
+            throw new ExceptionFr("Échec de la transformation en slug : le texte est vide ou ne contient pas de caractères valides");
         }
 
         // 8. Si $prefix est à true,

@@ -1,0 +1,63 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/settings.json
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Dépendances Composer
+vendor/
+composer.lock
+
+# Variables d'environnement
+.env
+.env.local
+.env.*.local
+
+# Fichiers de configuration sensibles
+config/database.php
+config/credentials.php
+
+# Logs et fichiers temporaires
+logs/
+tmp/
+cache/
+*.log
+
+# Session et fichiers de téléchargement
+sessions/
+uploads/
+downloads/
+
+# Node (si vous utilisez npm/webpack)
+node_modules/
+dist/
+build/
+
+# Fichiers compilés PHP
+*.phar
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Fichiers de test locaux
+*.bak
+*.tmp
+test-*.php
+
+# Fichiers de base de données
+*.sqlite
+*.db
+# *.sql (optionnel si vous versionnez vos migrations)

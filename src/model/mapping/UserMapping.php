@@ -139,17 +139,35 @@ class UserMapping extends AbstractMapping
 
     public function setPassword(?string $password): self
     {
-        $password = $password !== null ? trim($password) : null;
-
+        // Si null ou vide, on ne fait rien (cas de récupération depuis DB ou modification sans changement de mot de passe)
         if ($password === null || $password === '') {
-            throw new Exception("Le mot de passe ne peut pas être vide.");
+            return $this;
         }
 
+        $password = trim($password);
+
+        // Si c'est déjà un hash (commence par $2y$), on le stocke directement (cas de récupération depuis DB)
+        if (strpos($password, '$2y$') === 0) {
+            $this->password = $password;
+            return $this;
+        }
+
+        // Sinon, c'est un mot de passe en clair, on valide et on hash
         if (strlen($password) < 8) {
             throw new Exception("Le mot de passe doit contenir au moins 8 caractères.");
         }
 
         $this->password = password_hash($password, PASSWORD_DEFAULT);
+        return $this;
+    }
+
+    /**
+     * Définit directement le hash du mot de passe (pour la récupération depuis DB)
+     * Cette méthode ne valide pas et ne hash pas
+     */
+    public function setPasswordHash(?string $passwordHash): self
+    {
+        $this->password = $passwordHash;
         return $this;
     }
 

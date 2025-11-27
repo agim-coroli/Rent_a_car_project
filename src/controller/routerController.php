@@ -1,6 +1,7 @@
 <?php
 
 use service\UserService;
+use model\Exception\ExceptionFr;
 require_once PATH."/src/model/Utilities.php";
 # Connexion PDO
 try {
@@ -14,7 +15,8 @@ try {
         ]
     );
 } catch (Exception $e) {
-    die($e->getMessage());
+    $exceptionFr = new ExceptionFr("Erreur de connexion à la base de données : " . $e->getMessage(), 0, $e);
+    die($exceptionFr->getMessage());
 }
 
 

@@ -3,7 +3,7 @@
 // test
 
 use model\manager\UserManager;
-use model\mapping\UserMapping;
+// use model\mapping\UserMapping;
 
 
 
