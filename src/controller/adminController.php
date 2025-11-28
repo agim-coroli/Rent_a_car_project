@@ -10,29 +10,10 @@ if (isset($_GET['pg'])) {
     switch ($_GET['pg']) {
 
         case 'catalogue':
-            // ######################################### TEMPORAIRE #############################################
-
-            // if (isset($_GET['slug']) && !isset($_GET['id'])) {
-            //     // slug = voiture (ex: tesla-model-s)
-            //     $car = $carManager->findBySlug($_GET['slug']);
-            // } elseif (isset($_GET['slug']) && isset($_GET['id'])) {
-            //     // slug = voiture, id = action ou identifiant
-            //     if ($_GET['id'] === 'edit') {
-            //         $car = $carManager->findBySlug($_GET['slug']);
-            //         // afficher formulaire d’édition
-            //     } else {
-            //         $car = $carManager->findById((int)$_GET['id']);
-            //     }
-            // } else {
-            //     $cars = $carManager->findAll();
-            // }
-            // require_once PATH . "/src/view/catalogue.php";
-            // ######################################### TEMPORAIRE #############################################
-
+            require_once PATH . "/src/view/guests/catalogue.php";
             break;
 
         case 'dashboard':
-
             $tab = $adminUser->findAll();
             require_once PATH . "/src/view/dashboard.php";
             break;
@@ -104,7 +85,7 @@ if (isset($_GET['pg'])) {
                 try {
 
                     $updateUser = new UserMapping($_POST);
-                    if ($adminUser->update($updateUser)) {
+                    if ($adminUser->updateProfile($updateUser)) {
                         header('Location:?pg=dashboard');
                         exit();
                     } 
@@ -139,5 +120,5 @@ if (isset($_GET['pg'])) {
             break;
     }
 } else {
-    require_once PATH . "/src/view/home.php";
+    require_once PATH . "/src/view/guests/home.php";
 }

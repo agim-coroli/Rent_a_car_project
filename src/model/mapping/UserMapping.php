@@ -27,13 +27,16 @@ class UserMapping extends AbstractMapping
     protected ?string $full_name = null;
     protected ?string $pseudo = null;
     protected ?string $email = null;
+    protected ?string $email_token = null;
+    protected ?DateTime $email_token_expires = null;
     protected ?string $phone = null;
     protected ?string $password = null;
+    protected ?string $password_confirm = null;
     protected ?DateTime $date_birth = null;
     protected ?string $gender = null;
     protected ?bool $role = null;
     protected ?DateTime $created_at = null;
-
+    protected ?bool $is_verified = null;
 
     public function getId(): ?int
     {
@@ -103,6 +106,36 @@ class UserMapping extends AbstractMapping
         return $this;
     }
 
+    public function getEmailToken(): ?string
+    {
+        return $this->email_token;
+    }
+
+    public function setEmailToken(?string $email_token): self
+    {
+        $this->email_token = $email_token;
+        return $this;
+    }
+
+    public function getEmailTokenExpires(): ?DateTime
+    {
+        return $this->email_token_expires;
+    }
+
+
+
+    public function setEmailTokenExpires($email_token_expires): self
+    {
+        if ($email_token_expires instanceof \DateTime) {
+            $this->email_token_expires = $email_token_expires;
+        } elseif (is_string($email_token_expires) && $email_token_expires !== '') {
+            $this->email_token_expires = new \DateTime($email_token_expires);
+        } else {
+            $this->email_token_expires = null;
+        }
+        return $this;
+    }
+
 
     public function getPhone(): ?string
     {
@@ -158,6 +191,35 @@ class UserMapping extends AbstractMapping
         }
 
         $this->password = password_hash($password, PASSWORD_DEFAULT);
+        return $this;
+    }
+
+    public function getPasswordConfirm(): ?string
+    {
+        return $this->password_confirm;
+    }
+
+    public function setPasswordConfirm(?string $password_confirm): self
+    {
+        // Si null ou vide, on ne fait rien (cas de récupération depuis DB ou modification sans changement de mot de passe)
+        if ($password_confirm === null || $password_confirm === '') {
+            return $this;
+        }
+
+        $password_confirm = trim($password_confirm);
+
+        // Si c'est déjà un hash (commence par $2y$), on le stocke directement (cas de récupération depuis DB)
+        if (strpos($password_confirm, '$2y$') === 0) {
+            $this->password_confirm = $password_confirm;
+            return $this;
+        }
+
+        // Sinon, c'est un mot de passe en clair, on valide et on hash
+        if (strlen($password_confirm) < 8) {
+            throw new Exception("Le mot de passe doit contenir au moins 8 caractères.");
+        }
+
+        $this->password_confirm = password_hash($password_confirm, PASSWORD_DEFAULT);
         return $this;
     }
 
@@ -244,6 +306,16 @@ class UserMapping extends AbstractMapping
         } else {
             $this->created_at = null;
         }
+        return $this;
+    }
+
+    public function getIsVerified(): ?bool
+    {
+        return $this->is_verified;
+    }
+    public function setIsVerified(?bool $is_verified): self
+    {
+        $this->is_verified = $is_verified;
         return $this;
     }
 }

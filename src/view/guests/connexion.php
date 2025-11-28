@@ -19,8 +19,22 @@
 
             <body>
             <?php endif; ?>
-            <p>erreur 404</p>
-            <a href="./">Accueil</a>
+            <?php require_once PATH . "/src/view/components/header.php" ?>
+            <p>bienvenu sur connexion</p>
+
+
+            <form method="post">
+
+                <label for="email">email</label><br>
+                <input type="email" name="email"><br>
+
+                <label for="password">password</label><br>
+                <input type="password" name="password"><br>
+
+
+                <button type="submit">Connexion</button>
+
+            </form>
             </body>
 
 </html>

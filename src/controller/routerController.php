@@ -90,7 +90,7 @@ if (isset($_GET['api']) && $_GET['api'] === 'users') {
 
 
 // si nous sommes connecté en tant qu'admin
-if (isset($_SESSION['admin']) && $_SESSION['admin'] === true) {
+if (isset($_SESSION['role']) && $_SESSION['role'] === 1) {
     // on charge le contrôleur admin
     require_once PATH . "/src/controller/adminController.php";
 } else {

@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="assets/style.css">
+
 </head>
-<?php if (isset($_SESSION['role']) && $_SESSION['role'] === true) : ?>
+<?php if (isset($_SESSION['role']) && $_SESSION['role'] === 1) : ?>
 
     <body style="background-color: brown;">
 
-    <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] === false) : ?>
+    <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] === 0) : ?>
 
         <body style="background-color: green;">
 
@@ -19,8 +20,8 @@
 
             <body>
             <?php endif; ?>
-            <p>erreur 404</p>
-            <a href="./">Accueil</a>
+            <?php require_once PATH . "/src/view/components/header.php" ?>
+            <p>bienvenu sur catalogue</p>
             </body>
 
 </html>
