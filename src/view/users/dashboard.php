@@ -9,10 +9,8 @@
 </head>
 
 <body style="background-color: green;">
-    <?php
-    require_once PATH . "/src/view/components/header.php";
-    ?>
-    
+    <?php require_once PATH . "/src/view/components/header.php"; ?>
+    <?php require_once PATH . "/src/view/components/profil.php"; ?>
 </body>
 
 </html>

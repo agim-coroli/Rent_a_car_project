@@ -16,5 +16,4 @@ spl_autoload_register(function ($class) {
     $class = str_replace('\\', '/', $class);
     require PATH . '/src/' . $class . '.php';
 });
-
 require_once PATH . "/src/controller/routerController.php";

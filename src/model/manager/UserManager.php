@@ -72,21 +72,38 @@ class UserManager implements ManagerInterface, UserInterface
         }
     }
 
-    public function updateProfile(UserMapping $user, bool $updatePassword = false): bool
+    public function updateProfile(UserMapping $user): bool
     {
         if ($user->getId() === null) {
             return false;
         }
-        try {
-            $sql = "UPDATE users SET
-                full_name = :full_name,
-                pseudo = :pseudo,
-                email = :email,
-                phone = :phone,
-                date_birth = :date_birth,
-                gender = :gender";
 
-            if ($updatePassword && $user->getPassword() !== null) {
+        try {
+            $sqlCheck = "SELECT id FROM users 
+                     WHERE (email = :email OR pseudo = :pseudo OR phone = :phone) 
+                     AND id != :id";
+            $stmtCheck = $this->pdo->prepare($sqlCheck);
+            $stmtCheck->execute([
+                ':email' => $user->getEmail(),
+                ':pseudo' => $user->getPseudo(),
+                ':phone' => $user->getPhone(),
+                ':id' => $user->getId()
+            ]);
+
+            if ($stmtCheck->fetch()) {
+                echo "<p style='color:red;'>❌ Email, pseudo ou téléphone déjà utilisé.</p>";
+                return false;
+            }
+
+            $sql = "UPDATE users SET
+            full_name = :full_name,
+            pseudo = :pseudo,
+            email = :email,
+            phone = :phone,
+            date_birth = :date_birth,
+            gender = :gender";
+
+            if ($user->getPassword() !== null && $user->getPassword() !== '') {
                 $sql .= ", password = :password";
             }
 
@@ -100,17 +117,19 @@ class UserManager implements ManagerInterface, UserInterface
             $stmt->bindValue(':date_birth', $user->getDateBirth()?->format('Y-m-d'));
             $stmt->bindValue(':gender', $user->getGender());
 
-            if ($updatePassword && $user->getPassword() !== null) {
-                $stmt->bindValue(':password', $user->getPassword());
+            if ($user->getPassword() !== null && $user->getPassword() !== '') {
+                $stmt->bindValue(':password', $user->getPassword()); 
             }
 
             $stmt->bindValue(':id', $user->getId(), PDO::PARAM_INT);
 
             return $stmt->execute();
         } catch (\Throwable $e) {
-            throw new ExceptionFr("Erreur lors de la mise à jour du profil : " . $e->getMessage(), 0, $e);
+            echo "<p style='color:red;'>❌ Erreur SQL : " . $e->getMessage() . "</p>";
+            return false;
         }
     }
+
 
     public function delete(int $id): bool
     {
@@ -181,6 +200,7 @@ class UserManager implements ManagerInterface, UserInterface
 
             session_regenerate_id(true);
 
+            $_SESSION['id'] = $user->getId();
             $_SESSION['role'] = (int) $user->getRole();
 
             return $user;
@@ -379,6 +399,14 @@ class UserManager implements ManagerInterface, UserInterface
         $stmt->bindValue(':password', $passwordHash, \PDO::PARAM_STR);
         $stmt->bindValue(':id', $user->getId(), \PDO::PARAM_INT);
 
+        return $stmt->execute();
+    }
+
+    public function deleteAccount(UserMapping $user): bool
+    {
+        $sql = "DELETE FROM users WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':id', $user->getId(), \PDO::PARAM_INT);
         return $stmt->execute();
     }
 }
