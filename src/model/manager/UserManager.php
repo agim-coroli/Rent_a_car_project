@@ -8,24 +8,6 @@ use model\UserInterface;
 use model\ManagerInterface;
 use model\Exception\ExceptionFr;
 
-// quand on creer un objet UserManager il ressemble a ->
-
-// UserManager Object {
-//     pdo => PDO Object (connexion à la base de données)
-//     table => "users"
-
-//     // Méthodes disponibles :
-//     create($user) => bool
-//     findById($id) => UserMapping|null
-//     findByEmail($email) => UserMapping|null
-//     findAll() => array[UserMapping]
-//     update($user) => bool
-//     delete($id) => bool
-//     connect($tab) => bool
-//     disconnect() => bool
-//     generateHiddenId() => string
-// }
-
 class UserManager implements ManagerInterface, UserInterface
 {
     protected PDO $pdo;
@@ -36,25 +18,21 @@ class UserManager implements ManagerInterface, UserInterface
         $this->pdo = $pdo;
     }
 
-    /**
-     * Crée un nouvel utilisateur en base
-     */
     public function create(UserMapping $user): bool
     {
         try {
-
-
             $sql = "INSERT INTO users 
-    (full_name, pseudo, email, email_token, email_token_expires, phone, password, date_birth, gender)
-    VALUES (:full_name, :pseudo, :email, :email_token, :email_token_expires, :phone, :password, :date_birth, :gender)";
+            (full_name, pseudo, email, email_token, email_token_expires, phone, password, date_birth, gender, 
+             password_token, password_token_expires, is_verified, created_at)
+        VALUES 
+            (:full_name, :pseudo, :email, :email_token, :email_token_expires, :phone, :password, :date_birth, :gender,
+             NULL, NULL, 0, NOW())";
 
             $emailTokenExpires = new \DateTime('+24 hours');
             $emailToken = bin2hex(random_bytes(32));
 
             $user->setEmailToken($emailToken);
             $user->setEmailTokenExpires($emailTokenExpires);
-
-
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':full_name', $user->getFullName());
@@ -72,9 +50,7 @@ class UserManager implements ManagerInterface, UserInterface
             throw new ExceptionFr("Erreur lors de la création de l'utilisateur : " . $e->getMessage(), 0, $e);
         }
     }
-    /**
-     * Récupère tous les utilisateurs
-     */
+
     public function findAll(): array
     {
         try {
@@ -82,7 +58,6 @@ class UserManager implements ManagerInterface, UserInterface
             $stmt = $this->pdo->query($sql);
             $results = [];
             while ($row = $stmt->fetch()) {
-                // Exclure le password de l'hydratation et le définir directement avec setPasswordHash
                 $passwordHash = $row['password'] ?? null;
                 unset($row['password']);
 
@@ -97,10 +72,6 @@ class UserManager implements ManagerInterface, UserInterface
         }
     }
 
-
-    /**
-     * Met à jour le profil d'un utilisateur (utilisé par l'utilisateur lui-même - peut modifier le mot de passe)
-     */
     public function updateProfile(UserMapping $user, bool $updatePassword = false): bool
     {
         if ($user->getId() === null) {
@@ -115,7 +86,6 @@ class UserManager implements ManagerInterface, UserInterface
                 date_birth = :date_birth,
                 gender = :gender";
 
-            // Ajouter le password seulement si on veut le modifier
             if ($updatePassword && $user->getPassword() !== null) {
                 $sql .= ", password = :password";
             }
@@ -142,9 +112,6 @@ class UserManager implements ManagerInterface, UserInterface
         }
     }
 
-    /**
-     * Supprime un utilisateur
-     */
     public function delete(int $id): bool
     {
         try {
@@ -158,9 +125,6 @@ class UserManager implements ManagerInterface, UserInterface
 
 
 
-    /**
-     * Déconnexion
-     */
     public function disconnect(): bool
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
@@ -184,9 +148,6 @@ class UserManager implements ManagerInterface, UserInterface
         return false;
     }
 
-    /**
-     * Connexion
-     */
     public function connect(array $tab): ?UserMapping
     {
         if (!isset($tab['email'], $tab['password'])) {
@@ -212,15 +173,15 @@ class UserManager implements ManagerInterface, UserInterface
                 return null;
             }
 
-            // Création de l'objet UserMapping avec toutes les données
+            if ((int)$row['is_verified'] === 0) {
+                return null;
+            }
+
             $user = new UserMapping($row);
 
-            // Regénérer l'ID de session pour sécurité
             session_regenerate_id(true);
 
-            // Stocker les infos en session
             $_SESSION['role'] = (int) $user->getRole();
-
 
             return $user;
         } catch (\Throwable $e) {
@@ -229,9 +190,7 @@ class UserManager implements ManagerInterface, UserInterface
     }
 
 
-    /**
-     * Recherche par ID
-     */
+
     public function findById(int $id): ?UserMapping
     {
         try {
@@ -244,7 +203,6 @@ class UserManager implements ManagerInterface, UserInterface
                 return null;
             }
 
-            // Exclure le password de l'hydratation et le définir directement avec setPasswordHash
             $passwordHash = $row['password'] ?? null;
             unset($row['password']);
 
@@ -257,9 +215,6 @@ class UserManager implements ManagerInterface, UserInterface
         }
     }
 
-    /**
-     * Recherche par email
-     */
     public function findByEmail(string $email): ?UserMapping
     {
         try {
@@ -272,7 +227,6 @@ class UserManager implements ManagerInterface, UserInterface
                 return null;
             }
 
-            // Exclure le password de l'hydratation et le définir directement avec setPasswordHash
             $passwordHash = $row['password'] ?? null;
             unset($row['password']);
 
@@ -285,6 +239,91 @@ class UserManager implements ManagerInterface, UserInterface
         }
     }
 
+    public function findByEmailForReset(string $email): ?UserMapping
+    {
+        try {
+            $sql = "SELECT id, email, full_name, password, password_token, password_token_expires 
+                FROM users WHERE email = :email LIMIT 1";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':email' => $email]);
+            $row = $stmt->fetch();
+
+            if (!$row) {
+                return null;
+            }
+
+            $passwordHash = $row['password'] ?? null;
+            unset($row['password']);
+
+            $user = new UserMapping($row);
+            $user->setPasswordHash($passwordHash);
+
+            return $user;
+        } catch (\Throwable $e) {
+            throw new ExceptionFr("Erreur lors de la recherche par email : " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function generatePasswordResetToken(UserMapping $user): bool
+    {
+        try {
+            $passwordTokenExpires = new \DateTime('+24 hours');
+            $passwordToken = bin2hex(random_bytes(32));
+
+            $sql = "UPDATE users 
+                SET password_token = :password_token,
+                    password_token_expires = :password_token_expires,
+                    is_verified = 0
+                WHERE id = :id";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':password_token', $passwordToken);
+            $stmt->bindValue(':password_token_expires', $passwordTokenExpires->format('Y-m-d H:i:s'));
+            $stmt->bindValue(':id', $user->getId(), PDO::PARAM_INT);
+
+            if ($stmt->execute()) {
+                $user->setPasswordToken($passwordToken);
+                $user->setPasswordTokenExpires($passwordTokenExpires);
+                return true;
+            }
+            return false;
+        } catch (\Throwable $e) {
+            throw new ExceptionFr("Erreur lors de la génération du token : " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function findByPasswordToken(string $token): ?UserMapping
+    {
+        try {
+            $sql = "SELECT * FROM users WHERE password_token = :token LIMIT 1";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':token' => $token]);
+            $row = $stmt->fetch();
+
+            if (!$row) {
+                return null;
+            }
+
+            if ($row['password_token_expires']) {
+                $expires = new \DateTime($row['password_token_expires']);
+                if ($expires < new \DateTime()) {
+                    return null;
+                }
+            }
+
+            $passwordHash = $row['password'] ?? null;
+            unset($row['password']);
+
+            $user = new UserMapping($row);
+            $user->setPasswordHash($passwordHash);
+
+            return $user;
+        } catch (\Throwable $e) {
+            throw new ExceptionFr("Erreur lors de la recherche par token : " . $e->getMessage(), 0, $e);
+        }
+    }
+
+
     public function findByToken(string $token): ?UserMapping
     {
         $sql = "SELECT * FROM users WHERE email_token = :token LIMIT 1";
@@ -294,6 +333,7 @@ class UserManager implements ManagerInterface, UserInterface
         $data = $stmt->fetch();
         return $data ? new UserMapping($data) : null;
     }
+
     public function confirmEmail(UserMapping $user): bool
     {
         $sql = "UPDATE users 
@@ -303,6 +343,42 @@ class UserManager implements ManagerInterface, UserInterface
             WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id', $user->getId(), \PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function getPasswordHashById(int $id): ?string
+    {
+        try {
+            $sql = "SELECT password FROM users WHERE id = :id LIMIT 1";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            $row = $stmt->fetch();
+
+            return $row['password'] ?? null;
+        } catch (\Throwable $e) {
+            throw new ExceptionFr("Erreur lors de la récupération du mot de passe : " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function resetPassword(UserMapping $user): bool
+    {
+        $passwordHash = $user->getPassword();
+
+        if ($passwordHash && strpos($passwordHash, '$2y$') !== 0) {
+            $passwordHash = password_hash($passwordHash, PASSWORD_DEFAULT);
+        }
+
+        $sql = "UPDATE users 
+            SET password = :password,
+                password_token = NULL,
+                password_token_expires = NULL,
+                is_verified = 1
+            WHERE id = :id";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':password', $passwordHash, \PDO::PARAM_STR);
+        $stmt->bindValue(':id', $user->getId(), \PDO::PARAM_INT);
+
         return $stmt->execute();
     }
 }

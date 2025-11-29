@@ -20,8 +20,13 @@
 
             <body>
             <?php endif; ?>
-            <?php require_once PATH. "/src/view/components/header.php" ?>
-            <p>bienvenu sur catalogue</p>
+            <?php require_once PATH . "/src/view/components/header.php" ?>
+            <form method="post">
+                <label for="email">email</label><br>
+                <input type="email" name="email"><br>
+
+                <button>changer mon mot de passe</button>
+            </form>
             </body>
 
 </html>

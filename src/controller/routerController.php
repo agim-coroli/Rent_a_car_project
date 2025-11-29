@@ -2,8 +2,11 @@
 
 use service\UserService;
 use model\Exception\ExceptionFr;
-require_once PATH."/src/model/Utilities.php";
-# Connexion PDO
+use Dotenv\Dotenv;
+
+
+require_once PATH . "/src/model/Utilities.php";
+
 try {
     $connectPDO = new PDO(
         DB_TYPE . ':host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET,
@@ -19,38 +22,29 @@ try {
     die($exceptionFr->getMessage());
 }
 
-
-// API pour la gestion des utilisateurs
 if (isset($_GET['api']) && $_GET['api'] === 'users') {
     $userService = new UserService($connectPDO);
 
-    // Récupération de la méthode HTTP
     $method = $_SERVER['REQUEST_METHOD'];
 
-    // Récupération de l'ID depuis l'URL (ex: ?api=users&id=1)
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 
-    // Récupération des données JSON du body
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
     switch ($method) {
         case 'GET':
             if ($id) {
-                // GET /?api=users&id=1
                 $response = $userService->getUserById($id);
             } else {
-                // GET /?api=users
                 $response = $userService->getAllUsers();
             }
             break;
 
         case 'POST':
-            // POST /?api=users
             $response = $userService->createUser($input);
             break;
 
         case 'PUT':
-            // PUT /?api=users&id=1
             if (!$id) {
                 $response = [
                     'success' => false,
@@ -63,7 +57,6 @@ if (isset($_GET['api']) && $_GET['api'] === 'users') {
             break;
 
         case 'DELETE':
-            // DELETE /?api=users&id=1
             if (!$id) {
                 $response = [
                     'success' => false,
@@ -83,26 +76,23 @@ if (isset($_GET['api']) && $_GET['api'] === 'users') {
             ];
     }
 
-    // Envoie la réponse JSON et arrête l'exécution
     $userService->sendJsonResponse($response);
     exit;
 }
 
 
-// si nous sommes connecté en tant qu'admin
+
+$dotenv = Dotenv::createImmutable(PATH);
+$dotenv->load();
+
 if (isset($_SESSION['role']) && $_SESSION['role'] === 1) {
-    // on charge le contrôleur admin
     require_once PATH . "/src/controller/adminController.php";
+} elseif (isset($_SESSION['role']) && $_SESSION['role'] === 0) {
+    require_once PATH . "/src/controller/userController.php";
 } else {
-    // on charge le contrôleur public
     require_once PATH . "/src/controller/publicController.php";
 }
 
-
-// Débogage
 debugBar();
 
-
-
-// Bonne pratique
 $connectPDO = null;

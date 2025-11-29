@@ -9,7 +9,8 @@
 </head>
 
 <body>
-    <?php require_once PATH . "/src/view/components/header.php" ?>
+<?php require_once PATH. "/src/view/components/header.php" ?>
+
 
     <p>inscription</p>
     <form method="post">
@@ -54,7 +55,7 @@
             document.getElementById('phone').value = "0477423505";
             document.getElementById('password').value = "123456789";
             document.getElementById('password_confirm').value = "123456789";
-            document.getElementById('date_birth').value = "1993-03-11"; // format YYYY-MM-DD pour <input type="date">
+            document.getElementById('date_birth').value = "1993-03-11";
             document.getElementById('gender').value = "Masculin";
         });
     </script>

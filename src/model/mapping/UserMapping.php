@@ -6,21 +6,6 @@ use DateTime;
 use model\AbstractMapping;
 use Exception;
 
-// Quand on creer un objet de UserMapping il ressemble a ca -> 
-
-// UserMapping Object {
-//     id => 1
-//     full_name => "John Doe"
-//     pseudo => "johndoe"
-//     email => "john@example.com"
-//     phone => "+32490120095"
-//     password => "$2y$10$..." (hashé)
-//     date_birth => DateTime Object (1990-01-15)
-//     gender => "Masculin"
-//     role => false
-//     created_at => DateTime Object (2024-01-01 10:00:00)
-// }
-
 class UserMapping extends AbstractMapping
 {
     protected ?int $id = null;
@@ -32,6 +17,8 @@ class UserMapping extends AbstractMapping
     protected ?string $phone = null;
     protected ?string $password = null;
     protected ?string $password_confirm = null;
+    protected ?string $password_token = null;
+    protected ?DateTime $password_token_expires = null;
     protected ?DateTime $date_birth = null;
     protected ?string $gender = null;
     protected ?bool $role = null;
@@ -154,8 +141,6 @@ class UserMapping extends AbstractMapping
             throw new Exception("Le numéro de téléphone ne doit pas dépasser 20 caractères.");
         }
 
-        // Vérification format international ou national
-        // Autorise : +32490120095, 0490120095, 0032490120095, etc.
         if (!preg_match('/^(?:\+|00)?[0-9]{6,20}$/', $phone)) {
             throw new Exception("Format de numéro de téléphone invalide.");
         }
@@ -172,20 +157,17 @@ class UserMapping extends AbstractMapping
 
     public function setPassword(?string $password): self
     {
-        // Si null ou vide, on ne fait rien (cas de récupération depuis DB ou modification sans changement de mot de passe)
         if ($password === null || $password === '') {
             return $this;
         }
 
         $password = trim($password);
 
-        // Si c'est déjà un hash (commence par $2y$), on le stocke directement (cas de récupération depuis DB)
         if (strpos($password, '$2y$') === 0) {
             $this->password = $password;
             return $this;
         }
 
-        // Sinon, c'est un mot de passe en clair, on valide et on hash
         if (strlen($password) < 8) {
             throw new Exception("Le mot de passe doit contenir au moins 8 caractères.");
         }
@@ -201,20 +183,17 @@ class UserMapping extends AbstractMapping
 
     public function setPasswordConfirm(?string $password_confirm): self
     {
-        // Si null ou vide, on ne fait rien (cas de récupération depuis DB ou modification sans changement de mot de passe)
         if ($password_confirm === null || $password_confirm === '') {
             return $this;
         }
 
         $password_confirm = trim($password_confirm);
 
-        // Si c'est déjà un hash (commence par $2y$), on le stocke directement (cas de récupération depuis DB)
         if (strpos($password_confirm, '$2y$') === 0) {
             $this->password_confirm = $password_confirm;
             return $this;
         }
 
-        // Sinon, c'est un mot de passe en clair, on valide et on hash
         if (strlen($password_confirm) < 8) {
             throw new Exception("Le mot de passe doit contenir au moins 8 caractères.");
         }
@@ -223,10 +202,34 @@ class UserMapping extends AbstractMapping
         return $this;
     }
 
-    /**
-     * Définit directement le hash du mot de passe (pour la récupération depuis DB)
-     * Cette méthode ne valide pas et ne hash pas
-     */
+    public function getPasswordToken(): ?string
+    {
+        return $this->password_token;
+    }
+
+    public function setPasswordToken(?string $password_token): self
+    {
+        $this->password_token = $password_token;
+        return $this;
+    }
+
+    public function getPasswordTokenExpires(): ?DateTime
+    {
+        return $this->password_token_expires;
+    }
+
+    public function setPasswordTokenExpires($password_token_expires): self
+    {
+        if ($password_token_expires instanceof \DateTime) {
+            $this->password_token_expires = $password_token_expires;
+        } elseif (is_string($password_token_expires) && $password_token_expires !== '') {
+            $this->password_token_expires = new \DateTime($password_token_expires);
+        } else {
+            $this->password_token_expires = null;
+        }
+        return $this;
+    }
+
     public function setPasswordHash(?string $passwordHash): self
     {
         $this->password = $passwordHash;
@@ -245,7 +248,11 @@ class UserMapping extends AbstractMapping
         if ($date_birth instanceof DateTime) {
             $this->date_birth = $date_birth;
         } elseif (is_string($date_birth) && $date_birth !== '') {
-            $this->date_birth = DateTime::createFromFormat('Y-m-d', $date_birth);
+            $date = DateTime::createFromFormat('Y-m-d', $date_birth);
+            if ($date === false) {
+                throw new Exception("Format de date invalide. Format attendu : YYYY-MM-DD (ex: 1990-01-15).");
+            }
+            $this->date_birth = $date;
         } else {
             $this->date_birth = null;
         }
@@ -282,8 +289,6 @@ class UserMapping extends AbstractMapping
         return $this->role;
     }
 
-    // pas besoin ---------------------------
-
     public function setRole(?bool $role): self
     {
         $this->role = $role;
@@ -294,8 +299,6 @@ class UserMapping extends AbstractMapping
     {
         return $this->created_at;
     }
-
-    // pas besoin ---------------------------
 
     public function setCreatedAt($created_at): self
     {

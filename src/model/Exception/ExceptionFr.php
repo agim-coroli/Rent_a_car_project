@@ -12,12 +12,9 @@ class ExceptionFr extends \Exception
 
     private function traduireMessage(string $message): string
     {
-        // Extraire le code SQLSTATE si présent
         $sqlState = $this->extraireSqlState($message);
         
-        // Traductions des erreurs PDO courantes
         $traductions = [
-            // Erreurs PHP générales
             "Undefined index" => "Indice non défini",
             "Division by zero" => "Division par zéro",
             "Connection failed" => "Échec de la connexion",
@@ -26,7 +23,6 @@ class ExceptionFr extends \Exception
             "Class not found" => "Classe non trouvée",
             "Cannot access" => "Accès impossible",
             
-            // Erreurs PDO - Codes SQLSTATE
             "SQLSTATE[23000]" => "Violation de contrainte d'intégrité",
             "SQLSTATE[23000]: Integrity constraint violation" => "Violation de contrainte d'intégrité",
             "SQLSTATE[42S02]" => "Table ou vue non trouvée",
@@ -43,7 +39,6 @@ class ExceptionFr extends \Exception
             "SQLSTATE[08S01]" => "Erreur de communication avec le serveur",
             "SQLSTATE[HY093]" => "Nombre de paramètres invalide",
             
-            // Messages d'erreur MySQL/MariaDB courants
             "Duplicate entry" => "Cette entrée existe déjà",
             "Integrity constraint violation" => "Violation de contrainte d'intégrité",
             "Cannot add or update a child row" => "Impossible d'ajouter ou de mettre à jour une ligne enfant",
@@ -62,35 +57,27 @@ class ExceptionFr extends \Exception
             "Table already exists" => "La table existe déjà",
             "Unknown database" => "Base de données inconnue",
             
-            // Erreurs spécifiques communes
             "for key" => "pour la clé",
             "PRIMARY" => "PRIMAIRE",
             "UNIQUE" => "UNIQUE",
             "FOREIGN KEY" => "CLÉ ÉTRANGÈRE",
         ];
         
-        // Chercher une traduction exacte
         foreach ($traductions as $anglais => $francais) {
             if (stripos($message, $anglais) !== false) {
-                // Remplacer la partie anglaise par la traduction française
                 $message = str_ireplace($anglais, $francais, $message);
             }
         }
         
-        // Traductions spécifiques pour les codes SQLSTATE
         if ($sqlState) {
             $message = preg_replace('/SQLSTATE\[(\d+)\]/', 'Erreur SQL [$1]', $message);
         }
         
-        // Nettoyer les messages pour les rendre plus lisibles
         $message = $this->nettoyerMessage($message);
         
         return $message;
     }
     
-    /**
-     * Extrait le code SQLSTATE du message d'erreur
-     */
     private function extraireSqlState(string $message): ?string
     {
         if (preg_match('/SQLSTATE\[(\d+)\]/', $message, $matches)) {
@@ -99,12 +86,8 @@ class ExceptionFr extends \Exception
         return null;
     }
     
-    /**
-     * Nettoie le message pour le rendre plus lisible en français
-     */
     private function nettoyerMessage(string $message): string
     {
-        // Remplacer les patterns courants
         $patterns = [
             '/\bfor key\b/i' => 'pour la clé',
             '/\bkey\s+[\'"]?(\w+)[\'"]?/i' => 'clé "$1"',
@@ -119,5 +102,7 @@ class ExceptionFr extends \Exception
         return $message;
     }
 }
+
+
 
 

@@ -6,3 +6,6 @@ body{
     color: gold;
 }
 
+button, input{
+    color: black;
+}

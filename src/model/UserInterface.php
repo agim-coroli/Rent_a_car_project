@@ -1,5 +1,4 @@
 <?php
-// création du namespace
 namespace model;
 
 interface UserInterface

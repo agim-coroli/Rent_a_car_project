@@ -12,7 +12,6 @@
     <?php
     require_once PATH . "/src/view/components/header.php";
     ?>
-    <!-- Bouton de test pour ajouter des utilisateur -->
     <div style="margin: 20px 0;">
         <a href="?pg=generate-user" style="padding: 5px 5px; background-color: #4CAF50; text-decoration: none; border-radius: 5px; font-weight: bold;">
             ➕

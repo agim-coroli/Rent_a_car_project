@@ -1,4 +1,4 @@
-<!-- <?php
+<?php
 
 namespace service;
 
@@ -6,27 +6,6 @@ use PDO;
 use model\manager\UserManager;
 use model\mapping\UserMapping;
 
-// Quand on creer un objet de UserService il ressemble a ca -> 
-
-// UserService Object {
-//     userManager => UserManager Object {
-//         pdo => PDO Object
-//         table => "users"
-//     }
-    
-//     // Méthodes publiques (API) :
-//     getAllUsers() => array (JSON formaté)
-//     getUserById($id) => array (JSON formaté)
-//     createUser($data) => array (JSON formaté)
-//     updateUser($id, $data) => array (JSON formaté)
-//     deleteUser($id) => array (JSON formaté)
-//     sendJsonResponse($response) => void
-    
-//     // Méthodes privées (internes) :
-//     formatUser($user) => array
-//     formatUsers($users) => array
-//     formatResponse(...) => array
-// }
 class UserService
 {
     private UserManager $userManager;
@@ -36,10 +15,6 @@ class UserService
         $this->userManager = new UserManager($pdo);
     }
 
-    /**
-     * Récupère tous les utilisateurs
-     * GET /api/users
-     */
     public function getAllUsers(): array
     {
         try {
@@ -50,10 +25,6 @@ class UserService
         }
     }
 
-    /**
-     * Récupère un utilisateur par son ID
-     * GET /api/users/{id}
-     */
     public function getUserById(int $id): array
     {
         try {
@@ -69,14 +40,9 @@ class UserService
         }
     }
 
-    /**
-     * Crée un nouvel utilisateur
-     * POST /api/users
-     */
     public function createUser(array $data): array
     {
         try {
-            // Validation des données requises
             $required = ['full_name', 'pseudo', 'email', 'phone', 'password', 'date_birth', 'gender'];
             foreach ($required as $field) {
                 if (!isset($data[$field]) || empty($data[$field])) {
@@ -84,17 +50,14 @@ class UserService
                 }
             }
 
-            // Vérification si l'email existe déjà
             if ($this->userManager->findByEmail($data['email'])) {
                 return $this->formatResponse(false, 'Cet email est déjà utilisé', null, null, 409);
             }
 
-            // Création de l'utilisateur
             $user = new UserMapping($data);
             $success = $this->userManager->create($user);
 
             if ($success) {
-                // Récupérer l'utilisateur créé (par email car on n'a pas l'ID)
                 $createdUser = $this->userManager->findByEmail($data['email']);
                 return $this->formatResponse(true, 'Utilisateur créé avec succès', $this->formatUser($createdUser), null, 201);
             }
@@ -105,10 +68,6 @@ class UserService
         }
     }
 
-    /**
-     * Met à jour un utilisateur
-     * PUT /api/users/{id}
-     */
     public function updateUser(int $id, array $data): array
     {
         try {
@@ -118,7 +77,6 @@ class UserService
                 return $this->formatResponse(false, 'Utilisateur non trouvé', null, null, 404);
             }
 
-            // Mise à jour des champs fournis
             foreach ($data as $key => $value) {
                 $setter = 'set' . str_replace('_', '', ucwords($key, '_'));
                 if (method_exists($user, $setter) && $key !== 'id') {
@@ -143,10 +101,6 @@ class UserService
         }
     }
 
-    /**
-     * Supprime un utilisateur
-     * DELETE /api/users/{id}
-     */
     public function deleteUser(int $id): array
     {
         try {
@@ -168,9 +122,6 @@ class UserService
         }
     }
 
-    /**
-     * Formate un utilisateur pour la réponse JSON (sans le mot de passe)
-     */
     private function formatUser(UserMapping $user): array
     {
         return [
@@ -186,9 +137,6 @@ class UserService
         ];
     }
 
-    /**
-     * Formate un tableau d'utilisateurs
-     */
     private function formatUsers(array $users): array
     {
         return array_map(function ($user) {
@@ -196,9 +144,6 @@ class UserService
         }, $users);
     }
 
-    /**
-     * Formate la réponse JSON standardisée
-     */
     private function formatResponse(bool $success, string $message, ?array $data = null, ?string $error = null, int $statusCode = 200): array
     {
         $response = [
@@ -218,9 +163,6 @@ class UserService
         return $response;
     }
 
-    /**
-     * Envoie la réponse JSON avec les headers appropriés
-     */
     public function sendJsonResponse(array $response): void
     {
         http_response_code($response['status_code']);
@@ -228,4 +170,4 @@ class UserService
         echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
     }
-} -->
+}
