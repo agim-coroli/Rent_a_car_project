@@ -4,6 +4,13 @@ use model\manager\UserManager;
 use model\mapping\UserMapping;
 use model\Exception\ExceptionFr;
 
+
+if (!isset($_SESSION["role"]) || $_SESSION["role"] !== 1) {
+    header("Location:./");
+    exit();
+}
+
+
 $adminUser = new UserManager($connectPDO);
 
 if (isset($_GET['pg'])) {

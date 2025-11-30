@@ -2,22 +2,43 @@
 
 use model\manager\UserManager;
 use model\mapping\UserMapping;
+
+use model\manager\CatalogueManager;
+use model\mapping\CatalogueMapping;
+
 use model\Exception\ExceptionFr;
 
+if (!isset($_SESSION["role"]) || $_SESSION["role"] !== 0) {
+    header("Location:./");
+    exit();
+}
+
 $adminUser = new UserManager($connectPDO);
+$manageCatalogue = new CatalogueManager($connectPDO);
 
 if (isset($_GET['pg'])) {
     switch ($_GET['pg']) {
 
         case 'catalogue':
-            require_once PATH . "/src/view/guests/catalogue.php";
+            if (isset($_GET["slug"]) && !empty($_GET["slug"])) {
+                $vehicule = $manageCatalogue->findBySlug($_GET["slug"]);
+                if ($vehicule) {
+                    require_once PATH . "/src/view/users/catalogue_detail.php";
+                } else {
+                    require_once PATH . "/src/view/404.php";
+                }
+            } else {
+                $allVehicule = $manageCatalogue->findAll();
+                require_once PATH . "/src/view/guests/catalogue.php";
+            }
             break;
+
 
         case 'dashboard':
             if (isset($_GET['modify']) && $_GET['modify'] === "account_modify") {
                 $userToUpdate = $adminUser->findById($_SESSION['id']);
 
-                if (!empty($_POST)) { 
+                if (!empty($_POST)) {
 
                     if (
                         empty($_POST['full_name']) ||

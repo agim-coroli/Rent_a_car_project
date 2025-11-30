@@ -2,6 +2,9 @@
 
 use model\manager\UserManager;
 use model\mapping\UserMapping;
+
+
+
 use model\Exception\ExceptionFr;
 use model\service\MailManager;
 
@@ -11,7 +14,6 @@ $manageUser = new UserManager($connectPDO);
 
 if (isset($_GET['pg'])) {
     switch ($_GET['pg']) {
-
         case 'catalogue':
             require_once PATH . "/src/view/guests/catalogue.php";
 
