@@ -20,19 +20,20 @@ if (isset($_GET['pg'])) {
     switch ($_GET['pg']) {
 
         case 'catalogue':
-            if (isset($_GET["slug"]) && !empty($_GET["slug"])) {
-                $vehicule = $manageCatalogue->findBySlug($_GET["slug"]);
-                if ($vehicule) {
-                    require_once PATH . "/src/view/users/catalogue_detail.php";
-                } else {
-                    require_once PATH . "/src/view/404.php";
-                }
+            if (isset($_GET['reservation'], $_GET['slug']) && !empty($_GET['slug'])) {
+                // Page réservation
+                $vehiculeToReserve = $manageCatalogue->findBySlug($_GET['slug']);
+                require_once PATH . "/src/view/users/reservations_vehicule.php";
+            } elseif (isset($_GET['slug']) && !empty($_GET['slug'])) {
+                // Page détail
+                $vehiculeDetails = $manageCatalogue->findBySlug($_GET['slug']);
+                require_once PATH . "/src/view/users/catalogue_detail.php";
             } else {
+                // Liste complète
                 $allVehicule = $manageCatalogue->findAll();
                 require_once PATH . "/src/view/guests/catalogue.php";
             }
             break;
-
 
         case 'dashboard':
             if (isset($_GET['modify']) && $_GET['modify'] === "account_modify") {

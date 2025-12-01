@@ -146,36 +146,35 @@
 
     <div class="car-detail-container">
         <div class="car-image">
-            <img src="assets/img/<?= htmlspecialchars($vehicule->getImage()) ?>"
-                alt="<?= htmlspecialchars($vehicule->getMarque()) ?>"
+            <img src="assets/img/<?= htmlspecialchars($vehiculeDetails->getImage()) ?>"
+                alt="<?= htmlspecialchars($vehiculeDetails->getMarque()) ?>"
                 onerror="this.onerror=null; this.src='assets/img/no-image-available.webp';">
 
 
         </div>
         <div class="car-info">
             <div class="car-title">
-                <h1><?= htmlspecialchars($vehicule->getMarque()) ?></h1>
-                <h2><?= htmlspecialchars($vehicule->getDescription()) ?></h2>
-                <h3>Caution : <?= htmlspecialchars($vehicule->getCaution()) ?> €</h3>
+                <h1><?= htmlspecialchars($vehiculeDetails->getMarque()) ?></h1>
+                <h2><?= htmlspecialchars($vehiculeDetails->getDescription()) ?></h2>
+                <h3>Caution : <?= htmlspecialchars($vehiculeDetails->getCaution()) ?> €</h3>
             </div>
             <ul>
-                <li>Navigateur GPS : <?= htmlspecialchars($vehicule->getNavigateurGps()) ?></li>
-                <li>Transmission : <?= htmlspecialchars($vehicule->getTransmission()) ?></li>
-                <li>Carburant : <?= htmlspecialchars($vehicule->getCarburant()) ?></li>
-                <li>Nombre de sièges : <?= htmlspecialchars($vehicule->getNombreSiege()) ?></li>
-                <li>Année : <?= htmlspecialchars($vehicule->getAnnee()->format("Y")) ?></li>
-                <li>Prix : <?= htmlspecialchars($vehicule->getPrix()) ?>€/jour</li>
-                <li>Volume : <?= htmlspecialchars($vehicule->getVolume()) ?></li>
-                <li>Dimension (LxLxH) : <?= htmlspecialchars($vehicule->getDimension()) ?></li>
-                <li>Charge utile : <?= htmlspecialchars($vehicule->getChargeUtile()) ?></li>
-                <li>Puissance : <?= htmlspecialchars($vehicule->getPuissance()) ?></li>
-                <li>Air-co : <?= htmlspecialchars($vehicule->getAirCo()) ?></li>
-                <li>Classe : <?= htmlspecialchars($vehicule->getClasseEnvironnementale()) ?></li>
-                <li>Km inclus : <?= htmlspecialchars($vehicule->getKmInclus()) ?></li>
+                <li>Navigateur GPS : <?= htmlspecialchars($vehiculeDetails->getNavigateurGps()) ?></li>
+                <li>Transmission : <?= htmlspecialchars($vehiculeDetails->getTransmission()) ?></li>
+                <li>Carburant : <?= htmlspecialchars($vehiculeDetails->getCarburant()) ?></li>
+                <li>Nombre de sièges : <?= htmlspecialchars($vehiculeDetails->getNombreSiege()) ?></li>
+                <li>Année : <?= htmlspecialchars($vehiculeDetails->getAnnee()->format("Y")) ?></li>
+                <li>Prix : <?= htmlspecialchars($vehiculeDetails->getPrix()) ?>€/jour</li>
+                <li>Volume : <?= htmlspecialchars($vehiculeDetails->getVolume()) ?></li>
+                <li>Dimension (LxLxH) : <?= htmlspecialchars($vehiculeDetails->getDimension()) ?></li>
+                <li>Charge utile : <?= htmlspecialchars($vehiculeDetails->getChargeUtile()) ?></li>
+                <li>Puissance : <?= htmlspecialchars($vehiculeDetails->getPuissance()) ?></li>
+                <li>Air-co : <?= htmlspecialchars($vehiculeDetails->getAirCo()) ?></li>
+                <li>Classe : <?= htmlspecialchars($vehiculeDetails->getClasseEnvironnementale()) ?></li>
+                <li>Km inclus : <?= htmlspecialchars($vehiculeDetails->getKmInclus()) ?></li>
             </ul>
             <div class="car-actions">
                 <a href="?pg=catalogue">FERMER</a>
-                <a href="">RESERVER</a>
             </div>
         </div>
     </div>

@@ -45,6 +45,9 @@
         .card-content {
             padding: 1rem;
         }
+        .card-content>div {
+            margin-bottom: 1.5rem;
+        }
 
         .card-content h1 {
             font-size: 1.2rem;
@@ -57,7 +60,7 @@
             color: #555;
         }
 
-        .card-content button, .card-content a {
+        .card-content a {
             margin: 0.25rem;
             padding: 0.5rem 1rem;
             border: none;
@@ -108,7 +111,7 @@
                                 <div>Nombre de sièges : <?= htmlspecialchars($vehicule->getNombreSiege()) ?></div>
                             </div>
                             <a href="?pg=catalogue&slug=<?=$vehicule->getSlug() ?>">En savoir plus</a>
-                            <button>Réserver</button>
+                            <a href="?pg=catalogue&slug=<?=$vehicule->getSlug() ?>&reservation">Réserver</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
