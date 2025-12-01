@@ -59,6 +59,12 @@
             margin-top: 1rem;
         }
 
+        .reservation-form-debut,
+        .reservation-form-fin {
+            display: flex;
+        }
+
+        /* adzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz */
         .reservation-form label {
             font-weight: bold;
         }
@@ -136,14 +142,49 @@
             </div>
 
             <!-- Formulaire de réservation -->
-            <form class="reservation-form" method="post" action="?pg=reservation_confirm">
-                <input type="hidden" name="vehicule_id" value="<?= htmlspecialchars($vehiculeToReserve->getId()) ?>">
+            <form class="reservation-form" method="post">
 
-                <label for="date_debut">Date et heure de début :</label>
-                <input type="datetime-local" id="date_debut" name="date_debut" required>
+                <fieldset style="padding: 1.5rem; display: flex; align-items: center;">
+                    <legend style="font-weight: bolder;">Date de début</legend>
 
-                <label for="date_fin">Date et heure de fin :</label>
-                <input type="datetime-local" id="date_fin" name="date_fin" required>
+                    <label style="font-size: 1.5rem;" for="date_debut">📆&nbsp;</label>
+                    <input
+                        type="date"
+                        id="date_debut"
+                        name="date_debut"
+                        required
+                        style="padding: .3rem; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                    &nbsp;&nbsp;&nbsp;
+
+                    <label style="font-size: 1.5rem;" for="heure_fin">🕛&nbsp;</label>
+                    <select
+                        id="heure_fin"
+                        name="heure_fin"
+                        required
+                        style="padding: .3rem; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                        <?php foreach ($datesAndHours as $hours): ?>
+                            <option value="<?= $hours->getHoraire() ?>"><?= $hours->getHoraire() ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </fieldset>
+
+
+                <fieldset style="padding: 1.5rem; display: flex; align-items: center;">
+                    <legend style="font-weight: bolder;">Date de fin</legend>
+
+                    <label style="font-size: 1.5rem;" for="date_debut">📆&nbsp;</label>
+                    <input type="date" id="date_fin" name="date_fin" required
+                        style="padding: .3rem; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                    &nbsp;&nbsp;&nbsp;
+                    <label style="font-size: 1.5rem;" for="heure_fin">🕛&nbsp;</label>
+                    <select id="heure_debut" name="heure_debut" required
+                        style="padding: .3rem; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                        <?php foreach ($datesAndHours as $hours): ?>
+                            <option value="<?= $hours->getHoraire() ?>"><?= $hours->getHoraire() ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </fieldset>
+
 
                 <div class="reservation-actions">
                     <button type="submit">Valider la réservation</button>

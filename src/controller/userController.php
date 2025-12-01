@@ -6,6 +6,9 @@ use model\mapping\UserMapping;
 use model\manager\CatalogueManager;
 use model\mapping\CatalogueMapping;
 
+use model\manager\AgendaManager;
+use model\mapping\AgendaMapping;
+
 use model\Exception\ExceptionFr;
 
 if (!isset($_SESSION["role"]) || $_SESSION["role"] !== 0) {
@@ -15,6 +18,7 @@ if (!isset($_SESSION["role"]) || $_SESSION["role"] !== 0) {
 
 $adminUser = new UserManager($connectPDO);
 $manageCatalogue = new CatalogueManager($connectPDO);
+$manageAgenda = new AgendaManager($connectPDO);
 
 if (isset($_GET['pg'])) {
     switch ($_GET['pg']) {
@@ -23,6 +27,9 @@ if (isset($_GET['pg'])) {
             if (isset($_GET['reservation'], $_GET['slug']) && !empty($_GET['slug'])) {
                 // Page réservation
                 $vehiculeToReserve = $manageCatalogue->findBySlug($_GET['slug']);
+                $datesAndHours = $manageAgenda->getAllDatesAndHours();
+                
+                // var_dump($datesAndHours);
                 require_once PATH . "/src/view/users/reservations_vehicule.php";
             } elseif (isset($_GET['slug']) && !empty($_GET['slug'])) {
                 // Page détail

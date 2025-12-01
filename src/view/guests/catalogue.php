@@ -101,6 +101,7 @@
                                 onerror="this.onerror=null; this.src='assets/img/no-image-available.webp';">
 
                         </div>
+                        
                         <div class="card-content">
                             <h1><?= htmlspecialchars($vehicule->getMarque()) ?></h1>
                             <h2>Caution : <?= htmlspecialchars($vehicule->getCaution()) ?> €</h2>
