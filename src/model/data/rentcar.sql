@@ -3,10 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : lun. 01 déc. 2025 à 17:27
+-- Généré le : lun. 01 déc. 2025 à 21:07
 -- Version du serveur : 8.4.7
 -- Version de PHP : 8.3.28
 
+SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -20,6 +21,46 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `rentcar`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `agenda`
+--
+
+DROP TABLE IF EXISTS `agenda`;
+CREATE TABLE IF NOT EXISTS `agenda` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `horaire` time NOT NULL,
+  `date_reservation` date NOT NULL,
+  `is_reserved` tinyint(1) DEFAULT '0',
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `vehicule_id` int UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `vehicule_id` (`vehicule_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `agenda`
+--
+
+INSERT INTO `agenda` (`id`, `horaire`, `date_reservation`, `is_reserved`, `user_id`, `vehicule_id`) VALUES
+(1, '09:00:00', '2025-12-02', 0, NULL, NULL),
+(2, '09:30:00', '2025-12-02', 0, NULL, NULL),
+(3, '10:00:00', '2025-12-02', 0, NULL, NULL),
+(4, '10:30:00', '2025-12-02', 0, NULL, NULL),
+(5, '11:00:00', '2025-12-02', 0, NULL, NULL),
+(6, '11:30:00', '2025-12-02', 0, NULL, NULL),
+(7, '12:00:00', '2025-12-02', 0, NULL, NULL),
+(8, '12:30:00', '2025-12-02', 0, NULL, NULL),
+(9, '13:00:00', '2025-12-02', 0, NULL, NULL),
+(10, '13:30:00', '2025-12-02', 0, NULL, NULL),
+(11, '14:00:00', '2025-12-02', 0, NULL, NULL),
+(12, '14:30:00', '2025-12-02', 0, NULL, NULL),
+(13, '15:00:00', '2025-12-02', 0, NULL, NULL),
+(14, '15:30:00', '2025-12-02', 0, NULL, NULL),
+(15, '16:00:00', '2025-12-02', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -174,10 +215,18 @@ CREATE TABLE IF NOT EXISTS `vehicule_status` (
 --
 
 --
+-- Contraintes pour la table `agenda`
+--
+ALTER TABLE `agenda`
+  ADD CONSTRAINT `agenda_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `agenda_ibfk_2` FOREIGN KEY (`vehicule_id`) REFERENCES `catalogue` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Contraintes pour la table `vehicule_status`
 --
 ALTER TABLE `vehicule_status`
   ADD CONSTRAINT `vehicule_status_ibfk_1` FOREIGN KEY (`vehicule_id`) REFERENCES `catalogue` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
