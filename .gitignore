@@ -1,0 +1,4 @@
+# Dépendances Composer
+vendor/
+composer.lock
+.env

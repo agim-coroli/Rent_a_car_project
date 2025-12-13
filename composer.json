@@ -1,0 +1,19 @@
+{
+    "name": "gimzed/projet_rent_a_car",
+    "autoload": {
+        "psr-4": {
+            "Gimzed\\ProjetRentACar\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Agim Coroli",
+            "email": "agim.coroli8016@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.9",
+        "vlucas/phpdotenv": "^5.6",
+        "stripe/stripe-php": "^19.0"
+    }
+}
