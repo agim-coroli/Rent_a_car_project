@@ -5,6 +5,7 @@ namespace model\manager;
 use PDO;
 use Exception;
 use model\mapping\ReservationsMapping;
+use model\mapping\CatalogueMapping;
 use model\ManagerInterface;
 
 
@@ -43,5 +44,30 @@ WHERE id = :vehicule_id
         } catch (\Throwable $e) {
             throw new Exception("Erreur lors de la reservation : " . $e->getMessage(), 0, $e);
         }
+    }
+
+    public function findReservedByUser(int $userId): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT r.*, c.*
+            FROM reservations r
+            INNER JOIN catalogue c ON r.vehicule_id = c.id
+            WHERE r.user_id = :user_id
+              AND c.status = 'reservé'
+        ");
+
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $rows = $stmt->fetchAll();
+
+        foreach ($rows as $row) {
+            $reservations[] = [
+                'reservation' => new ReservationsMapping($row),
+                'vehicule'    => new CatalogueMapping($row)
+            ];
+        }
+
+        return $reservations;
     }
 }

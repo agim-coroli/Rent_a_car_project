@@ -3,8 +3,6 @@
 use model\manager\UserManager;
 use model\manager\CatalogueManager;
 
-
-
 use model\service\MailManager;
 
 $manageUser = new UserManager($connectPDO);

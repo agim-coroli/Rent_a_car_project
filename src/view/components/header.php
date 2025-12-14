@@ -5,6 +5,7 @@
                 <li><a href="./">home</a></li>
                 <li><a href="?pg=catalogue">catalogue</a></li>
                 <li><a href="?pg=dashboard">dashboard</a></li>
+                <li><a href="?pg=reservation">reservation</a></li>
                 <li><a href="?pg=deconnexion">deconnexion</a></li>
 
                 <p>------------------------------------------------</p>

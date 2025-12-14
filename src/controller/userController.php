@@ -6,6 +6,7 @@ use model\manager\ReservationsManager;
 
 use model\mapping\ReservationsMapping;
 
+use model\service\MailManager;
 
 if (!isset($_SESSION["role"]) || $_SESSION["role"] !== 0) {
     header("Location:./");
@@ -102,36 +103,76 @@ if (isset($_GET['pg'])) {
             if (isset($_POST['validation'])) {
 
 
-                $checkout_session = \Stripe\Checkout\Session::create([
-                    "mode" => "payment",
-                    "success_url" => "http://rentcar/src/view/users/reservation_billing.php",
-                    "line_items" => [
-                        [
-                            "quantity" => 1,
-                            "price_data" => [
-                                "currency" => "eur",
-                                "unit_amount" => $facture_total*100,
-                                "product_data" => [
-                                    "name" => $_SESSION['vehicule_name']
+                try {
+                    $checkout_session = \Stripe\Checkout\Session::create([
+                        "mode" => "payment",
+                        "success_url" => "http://rentcar/?pg=reservation_billing",
+                        "line_items" => [
+                            [
+                                "quantity" => 1,
+                                "price_data" => [
+                                    "currency" => "eur",
+                                    "unit_amount" => $facture_total * 100,
+                                    "product_data" => [
+                                        "name" => $_SESSION['vehicule_name']
+                                    ]
                                 ]
                             ]
                         ]
-                    ]
-                ]);
+                    ]);
 
 
-                http_response_code(303);
-                header('Location: ' . $checkout_session->url);
-                exit();
+                    http_response_code(303);
+                    header('Location: ' . $checkout_session->url);
+                    exit();
+                } catch (\Throwable $th) {
+                    echo "Le payment n'as pas pu etre effectué, opération annulé";
+                }
             }
             require_once PATH . "/src/view/users/checkout_form.php";
             break;
 
         case 'reservation_billing':
+
+            // en PROD utiliser un webhook Stripe (plus robuste)
+            // crée un endpoint /stripe/webhook qui écoute les événements checkout.session.completed.
+
+            // pour evité les facture en doublon en PROD mieux vaut gérer ça en base de données pour être sûr qu’une facture n’est jamais envoyée deux fois.
+
+            $dateDebut = new DateTime($_SESSION["date_debut"]);
+            $dateFin   = new DateTime($_SESSION["date_fin"]);
+            $interval  = $dateDebut->diff($dateFin);
+            $nbJours   = $interval->days;
+
+            $caution       = $_SESSION['caution'];
+            $prix_total    = $_SESSION['vehicule_prix'] * $nbJours;
+            $facture_total = $prix_total + $caution;
+
+            $user = $adminUser->findById($_SESSION['user_id']);
+            if (empty($_SESSION['facture_envoyee'])) {
+                $mailer = new MailManager;
+                $mailer->sendFacturationCopy($user, [
+                    'vehicule' => $_SESSION['vehicule_name'],
+                    'dateDebut' => $_SESSION['date_debut'],
+                    'dateFin' => $_SESSION['date_fin'],
+                    'nbJours' => $nbJours,
+                    'tarifJour' => $_SESSION['vehicule_prix'],
+                    'totalLocation' => $prix_total,
+                    'options' => $_SESSION['options'] ?? [],
+                    'totalFacture' => $facture_total
+                ]);
+                $_SESSION['facture_envoyee'] = true;
+            }
             require_once PATH . "/src/view/users/reservation_billing.php";
 
             break;
+        case 'reservation':
+            $vehiculeReserved = $manageReservations->findReservedByUser($_SESSION['user_id']);
 
+
+            require_once PATH . "/src/view/users/reservation.php";
+
+            break;
         case 'dashboard':
             if (isset($_GET['modify']) && $_GET['modify'] === "account_modify") {
                 $userToUpdate = $adminUser->findById($_SESSION['user_id']);

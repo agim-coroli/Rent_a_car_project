@@ -57,7 +57,7 @@
         <p><span class="highlight">Durée :</span> <?= $nbJours; ?> jour(s)</p>
         <p><span class="highlight">Statut :</span> Réservé en attente de paiement</p>
         <form method="post">
-            <button name="validation">Payer</button>
+            <button name="validation">Procéder au payement</button>
         </form>
     </div>
 </body>
